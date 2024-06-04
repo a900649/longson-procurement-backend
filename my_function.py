@@ -27,6 +27,7 @@ def load_info_by_excel():
 
     # 修正Column Name 多出來的空格
     common_col_df["Column Name"] = common_col_df["Column Name"].apply(lambda x: x.strip())
+    introduction_df["Product"] = introduction_df["Product"].apply(lambda x: x.strip())
     individual_col_df["Column Name"] = individual_col_df["Column Name"].apply(lambda x: x.strip())
 
     return title_df, introduction_df, common_col_df, individual_col_df, function_df, verification_code_df, internal_mail_receipients_df, supplier_mail_setting_df, photo_df, check_df
@@ -66,9 +67,12 @@ def create_new_results_file(common_col_list, individual_col_list, product_list):
     writer = pd.ExcelWriter(v.results_file_path)
 
     for product in product_list:
+
+        sheetname = product.replace("/"," ").replace("\\"," ").replace("?"," ").replace("*"," ").replace("["," ").replace("]"," ") # Excel Sheetname 不接受
+
         results_df = pd.DataFrame([], columns=col_list)
         results_df.set_index("RowID", inplace=True, drop=True)
-        results_df.to_excel(writer, sheet_name=product)
+        results_df.to_excel(writer, sheet_name=sheetname)
 
     writer.close()
 
@@ -123,3 +127,96 @@ def attachment_file_zip(program_name):
         for file_name in files:
             zf.write(os.path.join(root, file_name))
     zf.close()
+
+def send_internal_mail(df):
+
+    # 讀取Info Data
+    if v.data_source == "Excel":
+        title_df, introduction_df, common_col_df, individual_col_df, function_df, verification_code_df, internal_mail_receipients_df, supplier_mail_setting_df, photo_df, check_df = load_info_by_excel()
+    elif v.data_source == "Azure SQL":
+        title_df, introduction_df, common_col_df, individual_col_df, function_df, verification_code_df, internal_mail_receipients_df, supplier_mail_setting_df, photo_df, check_df = load_info_by_sql(
+            v.program_name)
+
+    for i in range(0,len(internal_mail_receipients_df)):
+
+        server = smtplib.SMTP(v.smtp_server, v.port)
+
+        try:
+            # 建立連線
+            context = ssl.create_default_context()
+
+            receivers = internal_mail_receipients_df.loc[i,"Mail"]
+            subject = internal_mail_receipients_df.loc[i,"Subject"]
+
+
+            # 調整Subject
+            for col in df.columns:
+                if "[["+col+"]]" in subject:
+                    subject = subject.replace("[["+col+"]]",df[col].values[0])
+
+            # 建立內文，夾帶附件用MIMEMultipart()
+            msg = MIMEMultipart()
+            msg['Subject'] = subject
+            msg['FROM'] = v.sender
+            msg['To'] = receivers
+
+            # 建立內文文字
+            att2 = MIMEText(subject)
+            msg.attach(att2)
+
+            server.starttls(context=context)
+            server.login(v.mail_user, v.mail_password)
+            server.sendmail(v.sender, receivers, msg.as_string())
+
+        except Exception as e:
+            print(e)
+            print("Mail Error Internal")
+        finally:
+            server.quit()
+
+def send_supplyer_mail(df):
+
+    # 讀取Info Data
+    if v.data_source == "Excel":
+        title_df, introduction_df, common_col_df, individual_col_df, function_df, verification_code_df, internal_mail_receipients_df, supplier_mail_setting_df, photo_df, check_df = load_info_by_excel()
+    elif v.data_source == "Azure SQL":
+        title_df, introduction_df, common_col_df, individual_col_df, function_df, verification_code_df, internal_mail_receipients_df, supplier_mail_setting_df, photo_df, check_df = load_info_by_sql(
+            v.program_name)
+
+    supplier_mail_list = [df[col].values[0] for col in df.columns if "mail" in str(col.lower())]
+
+    server = smtplib.SMTP(v.smtp_server, v.port)
+
+    try:
+        # 建立連線
+        context = ssl.create_default_context()
+
+        receivers = supplier_mail_list[0]
+        subject = supplier_mail_setting_df["Subject"].values[0]
+
+
+        # 調整Subject
+        for col in df.columns:
+            if "[[" + col + "]]" in subject:
+                subject = subject.replace("[[" + col + "]]", df[col].values[0])
+
+        # 建立內文，夾帶附件用MIMEMultipart()
+        msg = MIMEMultipart()
+        msg['Subject'] = subject
+        msg['FROM'] = v.sender
+        msg['To'] = receivers
+
+        # 建立內文文字
+        att2 = MIMEText(subject)
+        msg.attach(att2)
+
+        server = smtplib.SMTP(v.smtp_server, v.port)
+        server.starttls(context=context)
+        server.login(v.mail_user, v.mail_password)
+        server.sendmail(v.sender, receivers, msg.as_string())
+
+    except Exception as e:
+        print(e)
+        print("Mail Error Supplyer")
+    finally:
+        server.quit()

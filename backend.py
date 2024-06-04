@@ -133,12 +133,13 @@ def download_supplier_quotation_form():
                 wb = op.Workbook()
                 for ind in range(0,len(product_list)):
                     product = product_list[ind]
-                    ws = wb.create_sheet(title=product, index=ind)
+                    sheetname = product.replace("/", " ").replace("\\", " ").replace("?", " ").replace("*", " ").replace("[", " ").replace("]", " ")  # Excel Sheetname 不接受
+                    ws = wb.create_sheet(title=sheetname, index=ind)
 
                     #############################################################################################################
                     if v.data_source == "Excel":
                         try:
-                            results_df = pd.read_excel(v.results_file_path, sheet_name=product, index_col=0, engine="openpyxl")
+                            results_df = pd.read_excel(v.results_file_path, sheet_name=sheetname, index_col=0, engine="openpyxl")
                         except:
                             results_df = pd.DataFrame(columns=[])
                         results_df, different_list = add_formula_col(results_df, load_info.check_df)
@@ -200,12 +201,13 @@ def download_supplier_quotation_form():
                 wb = op.Workbook()
                 for ind in range(0,len(product_list)):
                     product = product_list[ind]
-                    ws = wb.create_sheet(title=product, index=ind)
+                    sheetname = product.replace("/", " ").replace("\\", " ").replace("?", " ").replace("*", " ").replace("[", " ").replace("]", " ")  # Excel Sheetname 不接受
+                    ws = wb.create_sheet(title=sheetname, index=ind)
 
                     #############################################################################################################
                     if v.data_source == "Excel":
                         try:
-                            results_df = pd.read_excel(v.results_file_path, sheet_name=product, index_col=0, engine="openpyxl")
+                            results_df = pd.read_excel(v.results_file_path, sheet_name=sheetname, index_col=0, engine="openpyxl")
                         except:
                             results_df = pd.DataFrame(columns=[])
                         if load_info.use_verification_code:

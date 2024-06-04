@@ -20,7 +20,7 @@ def create_info_table():
                      `Common Columns` LONGTEXT,
                      `Individual Columns` LONGTEXT,
                      `Function` VARCHAR(3000),
-                     `Verification Code` VARCHAR(3000),
+                     `Verification Code` LONGTEXT,
                      `Internal Mail Receipients` VARCHAR(3000),
                      `Supplier Mail Setting` VARCHAR(3000),
                      `Photo` VARCHAR(3000),
@@ -72,7 +72,8 @@ def create_results_table():
             if name == "RowID":
                 col_str = col_str + "VARCHAR(300)"
             else:
-                col_str = col_str + "VARCHAR(500)"
+                # col_str = col_str + "VARCHAR(500)"
+                col_str = col_str + "TEXT"
         elif col_type.lower() == "integer":
             col_str = col_str + "INT"
         elif col_type.lower() == "decimal":
@@ -91,3 +92,8 @@ def create_results_table():
     sql = """CREATE TABLE IF NOT EXISTS {}_results ({}, PRIMARY KEY (RowID))""".format(v.program_name,db_col_str)
     cursor.execute(sql)
     db.close()
+
+create_info_table()
+create_temp_table()
+update_info_table()
+create_results_table()

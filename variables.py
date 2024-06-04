@@ -4,10 +4,18 @@
 data_source = "Azure SQL"
 
 # 專案名稱
-program_name = "acetic_acid_2nd_half_2024"
+program_name = "longson_wheat_flour_procurement"
 
 # 存在可下載的專案名稱
-program_name_list = ["acetic_acid_2nd_half_2024"]
+program_name_list = ["longson_wheat_flour_procurement",
+                     "longson_tomato_paste_procurement",
+                     "longson_soybean_oil_procurement_20240604",
+                     "longson_refined_white_sugar_procurement_20240604",
+                     "longson_pepper_procurement_20240604",
+                     "longson_liquid_egg_procurement_20240604",
+                     "longson_dried_chilli_procurement_20240604",
+                     "longson_acid_procurement_20240604",
+                     "acetic_acid_2nd_half_2024"]
 
 # 網頁Title
 page_title = "Longson Procurement System"
@@ -48,3 +56,19 @@ last_col = [["Attachment","Text"],["Update DateTime","DateTime"],["Verification 
 # BLOB
 blob_connection_string = "DefaultEndpointsProtocol=https;AccountName=kenso;AccountKey=Wto5Ig361Z/aVQuxEfvM7b9MnKi3IctRB70fq5X53CCLlQ84BpFaS9T5HWVLcFwOVSEcljz0Aa40+AStQgHifw==;EndpointSuffix=core.windows.net"
 blob_container = "longson"
+
+# 寄送Mail資訊
+# smtp_server = "smtp.office365.com"
+# port = 587
+# sender = "lfp-procure@outlook.com"
+# mail_user = "lfp-procure@outlook.com"
+# mail_password = "Power365*"
+
+# Aaron給的Mail
+smtp_server = "smtp.office365.com"
+port = 587
+sender = "longsonprocure@outlook.com"
+mail_user = "longsonprocure@outlook.com"
+mail_password = "Yunxuan123"
+
+

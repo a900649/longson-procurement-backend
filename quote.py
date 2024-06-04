@@ -223,7 +223,7 @@ def form(now_datetime,name):
         #     for i in range(1, len(common_col_list),2):
         #         common_results_dict = create_data_input(common_col_list[i], common_results_dict, "Common")
 
-        for i in range(1, len(common_col_list),1):
+        for i in range(0, len(common_col_list),1):
             common_results_dict = create_data_input(common_col_list[i], common_results_dict, "Common")
 
 
@@ -264,7 +264,7 @@ def form(now_datetime,name):
                     #     for i in range(1, len(individual_col_list), 2):
                     #         tab1_individual_results_dict = create_data_input(individual_col_list[i], tab1_individual_results_dict, "Tab1")
 
-                    for i in range(1, len(individual_col_list)):
+                    for i in range(0, len(individual_col_list)):
                         tab1_individual_results_dict = create_data_input(individual_col_list[i], tab1_individual_results_dict, "Tab1")
 
                     if str(load_info.use_attachment).lower() == "true":
@@ -291,7 +291,7 @@ def form(now_datetime,name):
                         #     for i in range(1, len(individual_col_list), 2):
                         #         tab1_individual_results_dict = create_data_input(individual_col_list[i], tab1_individual_results_dict, "Tab1")
 
-                        for i in range(1, len(individual_col_list)):
+                        for i in range(0, len(individual_col_list)):
                             tab1_individual_results_dict = create_data_input(individual_col_list[i], tab1_individual_results_dict, "Tab1")
 
                         if str(load_info.use_attachment).lower() == "true":
@@ -319,7 +319,7 @@ def form(now_datetime,name):
                     #     for i in range(1, len(individual_col_list), 2):
                     #         tab2_individual_results_dict = create_data_input(individual_col_list[i], tab2_individual_results_dict, "Tab2")
 
-                    for i in range(1, len(individual_col_list)):
+                    for i in range(0, len(individual_col_list)):
                         tab2_individual_results_dict = create_data_input(individual_col_list[i], tab2_individual_results_dict, "Tab2")
 
                     if str(load_info.use_attachment).lower() == "true":
@@ -348,7 +348,7 @@ def form(now_datetime,name):
                     #     for i in range(1, len(individual_col_list), 2):
                     #         tab3_individual_results_dict = create_data_input(individual_col_list[i], tab3_individual_results_dict, "Tab3")
 
-                    for i in range(1, len(individual_col_list)):
+                    for i in range(0, len(individual_col_list)):
                         tab3_individual_results_dict = create_data_input(individual_col_list[i], tab3_individual_results_dict, "Tab3")
 
                     if str(load_info.use_attachment).lower() == "true":
@@ -377,7 +377,7 @@ def form(now_datetime,name):
                     #     for i in range(1, len(individual_col_list), 2):
                     #         tab4_individual_results_dict = create_data_input(individual_col_list[i], tab4_individual_results_dict, "Tab4")
 
-                    for i in range(1, len(individual_col_list)):
+                    for i in range(0, len(individual_col_list)):
                         tab4_individual_results_dict = create_data_input(individual_col_list[i], tab4_individual_results_dict, "Tab4")
 
                     if str(load_info.use_attachment).lower() == "true":
@@ -406,7 +406,7 @@ def form(now_datetime,name):
                     #     for i in range(1, len(individual_col_list), 2):
                     #         tab5_individual_results_dict = create_data_input(individual_col_list[i], tab5_individual_results_dict, "Tab5")
 
-                    for i in range(1, len(individual_col_list)):
+                    for i in range(0, len(individual_col_list)):
                         tab5_individual_results_dict = create_data_input(individual_col_list[i], tab5_individual_results_dict, "Tab5")
 
                     if str(load_info.use_attachment).lower() == "true":
@@ -581,7 +581,8 @@ def form(now_datetime,name):
             excel_results_df_list = []
             for ind in range(0,len(product_list)):
                 product = product_list[ind]
-                excel_results_df = pd.read_excel(v.results_file_path, engine="openpyxl", sheet_name=product)
+                sheetname = product.replace("/"," ").replace("\\"," ").replace("?"," ").replace("*"," ").replace("["," ").replace("]"," ") # Excel Sheetname 不接受
+                excel_results_df = pd.read_excel(v.results_file_path, engine="openpyxl", sheet_name=sheetname)
                 excel_results_df.set_index("RowID", inplace=True, drop=True)
                 for col in df_col_name_list:
 
@@ -597,8 +598,17 @@ def form(now_datetime,name):
 
             writer = pd.ExcelWriter(v.results_file_path)
             for ind in range(0, len(product_list)):
-                excel_results_df_list[ind].to_excel(writer, sheet_name=product_list[ind])
+                sheetname = product_list[ind].replace("/", " ").replace("\\", " ").replace("?", " ").replace("*", " ").replace("[", " ").replace("]", " ")  # Excel Sheetname 不接受
+                excel_results_df_list[ind].to_excel(writer, sheet_name=sheetname)
             writer.close()
+
+        # Send Mail
+        if str(load_info.use_internal_mail).lower() == "true":
+            my.send_internal_mail(st.session_state['df'])
+
+        # Send Supplyer Mail
+        if str(load_info.use_supplyer_mail).lower() == "true":
+            my.send_supplyer_mail(st.session_state['df'])
 
         st.session_state["submit_status"] = True
         # st.experimental_rerun()
