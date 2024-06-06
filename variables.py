@@ -4,11 +4,15 @@
 data_source = "Azure SQL"
 
 # 專案名稱
-program_name = "longson_wheat_flour_procurement"
+program_name = "longson_wheat_flour_procurement_20240604"
 
 # 存在可下載的專案名稱
-program_name_list = ["longson_wheat_flour_procurement",
-                     "longson_tomato_paste_procurement",
+program_name_list = ["longson_new_spices_procurement_20240606",
+                     "longson_new_seasoning_n_premix_procurement_20240606",
+                     "longson_new_food_ingredient_procurement_20240606",
+                     "longson_new_flavours_procurement_20240606",
+                     "longson_wheat_flour_procurement_20240604",
+                     "longson_tomato_paste_procurement_20240604",
                      "longson_soybean_oil_procurement_20240604",
                      "longson_refined_white_sugar_procurement_20240604",
                      "longson_pepper_procurement_20240604",
