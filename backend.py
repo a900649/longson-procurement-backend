@@ -314,6 +314,22 @@ def download_supplier_quotation_form():
                 st.success("Deletion completed")
         ########################################
 
+        a1, a2 = st.columns([4, 1])
+        with a2:
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write("")
+            st.write(v.version)
+
 def delete_blob_file(delete_filename_path_list):
     blob_service_client = BlobServiceClient.from_connection_string(v.blob_connection_string)
     container_client = blob_service_client.get_container_client(v.blob_container)
