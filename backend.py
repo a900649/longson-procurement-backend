@@ -86,7 +86,7 @@ def download_supplier_quotation_form():
                 """, unsafe_allow_html=True)
 
     st.title("Download")
-    select_program = st.selectbox(label="Program", options=v.program_name_list)
+    select_program = st.selectbox(label="Program", options=v.program_name_list,index=v.program_name_list.index(v.program_name))
 
     if st.button('Confirm', key="4546"):
         # 讀取Info Data
@@ -116,7 +116,7 @@ def download_supplier_quotation_form():
         title_len = len(load_info.title_df)
         introduction_len = 1
 
-        c1, c2, c3= st.columns([1, 1, 1])
+        c1, c2, c3, c4= st.columns([1, 1, 1, 1])
 
         with c1:
             st.write("Row Data")
@@ -294,6 +294,8 @@ def download_supplier_quotation_form():
                                 file_blob.write(download_stream.readall())
 
 
+
+
                 # 壓縮檔案
                 my.attachment_file_zip(v.program_name)
                 with open("Attachment.zip", "rb") as fp:
@@ -303,7 +305,39 @@ def download_supplier_quotation_form():
                         file_name="Attachment.zip",
                         mime="application/zip"
                     )
+
+        with c4:
+            st.write("Delete Unnecessary Attachments")
+            if st.button('Execute', key="Delete Unnecessary Attachments"):
+                delete_filename_path_list = get_delete_file_list(select_program)
+                delete_blob_file(delete_filename_path_list)
+                st.success("Deletion completed")
         ########################################
+
+def delete_blob_file(delete_filename_path_list):
+    blob_service_client = BlobServiceClient.from_connection_string(v.blob_connection_string)
+    container_client = blob_service_client.get_container_client(v.blob_container)
+
+    for filename in delete_filename_path_list:
+        container_client.delete_blob(filename)
+
+def get_delete_file_list(select_program):
+    blob_container = ContainerClient.from_connection_string(conn_str=v.blob_connection_string, container_name=v.blob_container)
+    blob_list = blob_container.list_blobs("Attachment/{}".format(select_program))
+    filename_path_list = [blob.name for blob in blob_list]
+    product_list = list(set([i.split("/")[-3] for i in filename_path_list]))
+    supplier_list = list(set([ i.split("/")[-2].replace(i.split("/")[-2].split(" ")[-2] + " " + i.split("/")[-2].split(" ")[-1],"").strip() for i in filename_path_list]))
+    delete_filename_path_list = []
+    for product in product_list:
+        for supplier in supplier_list:
+            update_time_list = [filename.split("/")[-2].split(" ")[-2] + " " + filename.split("/")[-2].split(" ")[-1] for filename in filename_path_list if product in filename and supplier in filename]
+            if len(update_time_list) > 2 :
+                update_time_list = sorted(update_time_list)
+                delete_update_time_list = update_time_list[:-2]
+                temp_delete_filename_path_list = [filename for filename in filename_path_list for delete_update_time in delete_update_time_list if delete_update_time in filename and product in filename]
+                delete_filename_path_list = delete_filename_path_list + temp_delete_filename_path_list
+
+    return delete_filename_path_list
 
 def login():
 
